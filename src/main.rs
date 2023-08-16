@@ -10,8 +10,6 @@ fn main() {
         println!("Problem pasing arguments: {err}");
         process::exit(1);
     });
-    println!("{}", config.query);
-    println!("{}", config.file_path);
 
     if let Err(e) = cracking_codes::run(config) {
         println!("Application error: {e}");
