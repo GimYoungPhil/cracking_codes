@@ -1,16 +1,20 @@
-use std::{env, fs};
+use std::env;
+use std::process;
+
+use cracking_codes::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let query = &args[1];
-    let file_path = &args[2];
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        println!("Problem pasing arguments: {err}");
+        process::exit(1);
+    });
+    println!("{}", config.query);
+    println!("{}", config.file_path);
 
-    println!("{}", query);
-    println!("{}", file_path);
-
-    let contents = fs::read_to_string(file_path)
-        .expect("Shoud have been able to read the file");
-
-    print!("{}", contents);
+    if let Err(e) = cracking_codes::run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
 }
