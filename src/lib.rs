@@ -1,6 +1,6 @@
-use std::fs;
-use std::error::Error;
 use std::env;
+use std::error;
+use std::fs;
 
 pub struct Config {
     pub query: String,
@@ -32,7 +32,7 @@ impl Config {
     }
 }
 
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+pub fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
     let results = if config.ignore_case {
