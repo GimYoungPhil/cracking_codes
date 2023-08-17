@@ -12,10 +12,10 @@ impl Config {
             return Err("not enough arguments");
         }
 
-        Ok(Config {
-            query: args[1].clone(),
-            file_path: args[2].clone(),
-        })
+        let query = args[1].clone();
+        let file_path = args[2].clone();
+
+        Ok(Config { query, file_path })
     }
 }
 
@@ -30,16 +30,15 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 }
 
 fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-
-    let mut result: Vec<&str> = Vec::new();
+    let mut results: Vec<&str> = Vec::new();
 
     for line in contents.lines() {
         if line.contains(query) {
-            result.push(line);
+            results.push(line);
         }
     }
 
-    result
+    results
 }
 
 #[cfg(test)]
