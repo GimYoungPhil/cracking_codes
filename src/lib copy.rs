@@ -1,51 +1,44 @@
-
+use std::env;
 use std::error;
 use std::fs;
 
-pub mod the_reverse_cipher;
-
-pub enum Mode {
-    Encrypt,
-    Decript,
-}
-
 pub struct Config {
-    pub mode: Mode,
+    pub query: String,
     pub file_path: String,
+    pub ignore_case: bool,
 }
 
 impl Config {
     pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
         args.next();
 
-        let mode = match args.next() {
-            Some(arg) => match &arg[..] {
-                "encoding" => Mode::Encrypt,
-                "decoding" => Mode::Decript,
-                _ => return Err("Didn't match mode string('encoding' or 'decoding')"),
-            },
-            None => return Err("Didn't get a mode string"),
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn't get a query string"),
         };
 
         let file_path = match args.next() {
             Some(arg) => arg,
-            None => return Err("Didn'g get a file path"),
+            None => return Err("Didn't get a file path"),
         };
 
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
+
         Ok(Config {
-            mode,
+            query,
             file_path,
+            ignore_case,
         })
     }
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
-
     let contents = fs::read_to_string(config.file_path)?;
 
-    let results = match config.mode {
-        Mode::Encrypt => the_reverse_cipher::encrypt_message(&contents),
-        Mode::Decript => the_reverse_cipher::decrypt_message(&contents),
+    let results = if config.ignore_case {
+        search_case_insensitive(&config.query, &contents)
+    } else {
+        search(&config.query, &contents)
     };
 
     for line in results {
@@ -55,6 +48,21 @@ pub fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
+fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
+}
+
+fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let query = query.to_lowercase();
+
+    contents
+        .lines()
+        .filter(|line| line.to_lowercase().contains(&query))
+        .collect()
+}
 
 #[cfg(test)]
 mod tests {

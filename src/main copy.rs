@@ -1,10 +1,10 @@
 use std::env;
 use std::process;
 
-use cracking_codes;
+use cracking_codes::Config;
 
 fn main() {
-    let config = cracking_codes::Config::build(env::args()).unwrap_or_else(|err| {
+    let config = Config::build(env::args()).unwrap_or_else(|err| {
         eprintln!("Problem parsing arguments: {err}");
         process::exit(1);
     });
