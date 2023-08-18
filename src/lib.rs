@@ -6,7 +6,7 @@ pub mod the_reverse_cipher;
 
 pub enum Mode {
     Encrypt,
-    Decript,
+    Decrypt,
 }
 
 pub struct Config {
@@ -21,7 +21,7 @@ impl Config {
         let mode = match args.next() {
             Some(arg) => match &arg[..] {
                 "encoding" => Mode::Encrypt,
-                "decoding" => Mode::Decript,
+                "decoding" => Mode::Decrypt,
                 _ => return Err("Didn't match mode string('encoding' or 'decoding')"),
             },
             None => return Err("Didn't get a mode string"),
@@ -45,7 +45,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
 
     let results = match config.mode {
         Mode::Encrypt => the_reverse_cipher::encrypt_message(&contents),
-        Mode::Decript => the_reverse_cipher::decrypt_message(&contents),
+        Mode::Decrypt => the_reverse_cipher::decrypt_message(&contents),
     };
 
     for line in results {
